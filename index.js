@@ -1,13 +1,14 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const consoleTable = require("console.table");
-const fs = require("fs");
+require("dotenv").config();
+console.log(process.env);
 
 const db = mysql.createConnection(
   {
     host: "localhost",
     user: "root",
-    password: "00000000",
+    password: process.env.PW,
     database: "tracker",
   },
   console.log(`Connected to the tracker database.`)
@@ -31,6 +32,21 @@ function viewRoles() {
   });
 }
 
+function addDepartment() {
+  inquirer
+    .prompt({
+      type: "input",
+      message: "Enter department name",
+      name: "departmentName",
+    })
+    .then((response) => {
+      console.log(`INSERT INTO department (name) VALUES (${response.departmentName})`);
+      return;
+    });
+}
+function addEmployee() {}
+function addRole() {}
+
 inquirer
   .prompt([
     {
@@ -44,7 +60,7 @@ inquirer
         { name: "View all Roles", value: "VIEW ROLES" },
         { name: "Add a new Role", value: "ADD ROLE" },
         { name: "View all Departments", value: "VIEW DEPARTMENTS" },
-        { name: "Add a new Departments", value: "ADD DEPARTMENT" },
+        { name: "Add a new Department", value: "ADD DEPARTMENT" },
         // -- BONUS --
         // update employee managers
         // { name: "Update Employee Manager", value: "UPDATE MANAGER" },
@@ -83,11 +99,10 @@ inquirer
 
     if (response.choice === "VIEW DEPARTMENTS") viewDepartments();
 
-    if (response.choice === "ADD DEPARTMENT") {
-    }
+    if (response.choice === "ADD DEPARTMENT") addDepartment();
 
     if (response.choice === "EXIT") {
-      prompt.ui.close();
-      exit();
+      // prompt.ui.close();
+      // exit();
     }
   });
