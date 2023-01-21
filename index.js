@@ -3,88 +3,55 @@ const mysql = require("mysql2");
 const consoleTable = require("console.table");
 const fs = require("fs");
 
-const questions = [
+const db = mysql.createConnection(
   {
-    type: "list",
-    message: "What would you like to do?",
-    name: "selection",
-    choices: [
-      {
-        name: "View All Employees",
-        value: ["view", "employee"],
-      },
-      {
-        name: "Add Employee",
-        value: ["add", "employee"],
-      },
-      {
-        name: "Update Employee Role",
-        value: ["update", "employee"],
-      },
-      {
-        name: "View All Roles",
-        value: ["view", "role"],
-      },
-      {
-        name: "Add Role",
-        value: ["add", "role"],
-      },
-      {
-        name: "View All Departments",
-        value: ["view", "department"],
-      },
-      {
-        name: "Add Department",
-        value: ["add", "department"],
-      },
-      {
-        name: "Exit",
-        value: "exit",
-      },
-    ],
+    host: "localhost",
+    user: "root",
+    password: "00000000",
+    database: "tracker",
   },
-];
+  console.log(`Connected to the tracker database.`)
+);
 
-function init() {
-  inquirer.prompt(questions).then((response) => {
-    const selected = response.selection;
-    if (selected !== "exit") {
-      if (selected[0] === "view") view(selected[1]);
-      if (selected[0] === "add") view(selected[1]);
-      if (selected[0] === "update") view(selected[1]);
-      init();
-    } else {
-      // exit program
-      console.log("bye");
-      return;
-    }
+function viewDepartments() {
+  db.query("SELECT * FROM department", function (err, results) {
+    console.table(results);
   });
 }
 
-function view(selected) {
-  // emp
-  if (selected === "employee") {
-  }
-  // role
-  else if (selected === "role") {
-  }
-  // dept
-  else {
-  }
-}
-function add(selected) {
-  // emp
-  if (selected === "employee") {
-  }
-  // role
-  else if (selected === "role") {
-  }
-  // dept
-  else {
-  }
-}
-function update(selected) {
-  // employee
+function viewEmployees() {
+  db.query("SELECT * FROM employee", function (err, results) {
+    console.table(results);
+  });
 }
 
-init();
+function viewRoles() {
+  db.query("SELECT * FROM role", function (err, results) {
+    console.table(results);
+  });
+}
+
+inquirer
+  .prompt([
+    {
+      type: "list",
+      message: "What would you like to do?",
+      name: "choice",
+      choices: [
+        { name: "View all Employees", value: "VIEW EMPLOYEES" },
+        { name: "View all Roles", value: "VIEW ROLES" },
+        { name: "View all Departments", value: "VIEW DEPARTMENTS" },
+      ],
+    },
+  ])
+  .then((response) => {
+    if (response.choice === "VIEW DEPARTMENTS") {
+      viewDepartments();
+    }
+    if (response.choice === "VIEW EMPLOYEES") {
+      viewEmployees();
+    }
+    if (response.choice === "VIEW ROLES") {
+      viewRoles();
+    }
+  });
