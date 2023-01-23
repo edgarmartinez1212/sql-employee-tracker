@@ -43,23 +43,58 @@ function addDepartment() {
     })
     .then((response) => {
       db.query("INSERT INTO department (name) VALUES (?)", response.department, function (err, results) {
-        console.log(results);
+        console.log("Department successfully added.");
       });
       init();
     });
   // added department_name to the database
 }
 function addEmployee() {
-  // db.query("SELECT title from role", function (err, results) {
-  //   // console.log(typeof results, results);
-  //   const temp = [];
-  //   results.forEach((el) => {
-  //     temp.push(el.title);
-  //   });
-  //   temp.forEach((el) => {
-  //     roles.push(el);
-  //   });
-  // });
+  db.query("SELECT * FROM role", function (err, results) {
+    const roles = results.map((role) => ({
+      name: role.title,
+      value: role.id,
+    }));
+
+    db.query("SELECT * FROM employee", function (err, results) {
+      const managers = results.map((employee) => ({
+        name: employee.first_name + " " + employee.last_name,
+        value: employee.id,
+      }));
+
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "Enter first name of new Employee",
+            name: "firstName",
+          },
+          {
+            type: "input",
+            message: "Enter last name of new employee",
+            name: "lastName",
+          },
+          {
+            type: "list",
+            message: "What is the new employees role?",
+            name: "role",
+            choices: roles,
+          },
+          {
+            type: "list",
+            message: "Who is the new employees manager?",
+            name: "manager",
+            choices: managers,
+          },
+        ])
+        .then((response) => {
+          db.query("INSERT INTO employee SET ?", response, function (err, results) {
+            console.log("Role successfully added.");
+          });
+          init();
+        });
+    });
+  });
   //
   // enter employees first name
   // enter employees last name
@@ -99,10 +134,9 @@ function addRole() {
         },
       ])
       .then((response) => {
-        db.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [response.title, response.salary, response.department], function (err, results) {
-          console.log(results);
+        db.query("INSERT INTO role SET ?", response, function (err, results) {
+          console.log("Role successfully added.");
         });
-        console.log(response.title, response.salary, response.department);
         init();
       });
   });
