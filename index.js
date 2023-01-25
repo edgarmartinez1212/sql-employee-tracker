@@ -8,7 +8,7 @@ const db = mysql.createConnection(
     host: "localhost",
     user: "root",
     password: process.env.PW,
-    database: "tracker",
+    database: process.env.DB,
   },
   console.log(`Connected to the tracker database.`)
 );
@@ -49,6 +49,7 @@ function addDepartment() {
     });
   // added department_name to the database
 }
+
 function addEmployee() {
   db.query("SELECT * FROM role", function (err, results) {
     const roles = results.map((role) => ({
@@ -61,6 +62,7 @@ function addEmployee() {
         name: employee.first_name + " " + employee.last_name,
         value: employee.id,
       }));
+      managers.unshift({ name: "None", value: null });
 
       inquirer
         .prompt([
@@ -88,6 +90,7 @@ function addEmployee() {
           },
         ])
         .then((response) => {
+          console.log(response);
           db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [response.firstName, response.lastName, response.role, response.manager], function (err, results) {
             console.log("Role successfully added.");
           });
@@ -103,6 +106,7 @@ function addEmployee() {
   // added (first_name last_name) to the database
   // init();
 }
+
 function addRole() {
   // enter name of role
   // enter salary of role
@@ -183,6 +187,14 @@ function updateEmployeeRole() {
   });
 }
 
+// --- BONUS ---
+function updateManager() {}
+function viewEmployeeByManager() {}
+function deleteDepartment() {}
+function deleteRole() {}
+function deleteEmployee() {}
+function viewSumSalaries() {}
+
 function init() {
   inquirer
     .prompt([
@@ -200,42 +212,44 @@ function init() {
           { name: "Add a new Department", value: "ADD DEPARTMENT" },
           // -- BONUS --
           // update employee managers
-          // { name: "Update Employee Manager", value: "UPDATE MANAGER" },
+          { name: "Update Employee Manager", value: "UPDATE MANAGER" },
 
           // view employees by manager
-          // { name: "View Employees by Manager", value: "VIEW EMPLOYEE BY MANAGERS" },
+          { name: "View Employees by Manager", value: "VIEW EMPLOYEE BY MANAGERS" },
 
           // delete departments
-          // { name: "Delete Departments", value: "DELETE DEPARTMENTS" },
+          { name: "Delete Departments", value: "DELETE DEPARTMENTS" },
 
           // delete roles
-          // { name: "Delete Roles", value: "DELETE ROLES" },
+          { name: "Delete Roles", value: "DELETE ROLES" },
 
           // delete employees
-          // { name: "Delete Employees", value: "DELETE EMPLOYEES" },
+          { name: "Delete Employees", value: "DELETE EMPLOYEES" },
 
           // view total utilized budged of a dept (sum of salaries of all emps dept)
-          // { name: "View the sum of salaires of all departments", value: "BONUS_RENAME" },
+          { name: "View the sum of salaires of all departments", value: "VIEW SUM" },
           { name: "Exit", value: "EXIT" },
         ],
       },
     ])
     .then((response) => {
       if (response.choice === "VIEW EMPLOYEES") viewEmployees();
-
       if (response.choice === "ADD EMPLOYEE") addEmployee();
-
       if (response.choice === "UPDATE EMPLOYEE ROLE") updateEmployeeRole();
-
       if (response.choice === "VIEW ROLES") viewRoles();
-
       if (response.choice === "ADD ROLE") addRole();
-
       if (response.choice === "VIEW DEPARTMENTS") viewDepartments();
-
       if (response.choice === "ADD DEPARTMENT") addDepartment();
-
       if (response.choice === "EXIT") process.exit();
+
+      // --- BONUS ---
+      if (response.choice === "UPDATE MANAGER") updateManager();
+      if (response.choice === "VIEW EMPLOYEE BY MANAGERS") viewEmployeeByManager();
+      if (response.choice === "DELETE DEPARTMENTS") deleteDepartment();
+      if (response.choice === "DELETE ROLES") deleteRole();
+      if (response.choice === "DELETE EMPLOYEES") deleteEmployee();
+      if (response.choice === "VIEW SUM") viewSumSalaries();
+
       // init();
     });
 }
