@@ -14,6 +14,7 @@ title varchar(30) not null,
 salary decimal not null,
 department_id int not null,
 constraint fk_deparment foreign key (department_id) references department(id) on delete cascade
+-- constraint fk_deparment foreign key (department_id) references department(id) on delete set null
 );
 
 create table employee (
@@ -22,6 +23,7 @@ first_name varchar(30) not null,
 last_name varchar(30) not null,
 role_id int not null,
 constraint fk_role foreign key (role_id) references role(id) on delete cascade,
+-- constraint fk_role foreign key (role_id) references role(id) on delete set null,
 manager_id int,
 constraint fk_manager foreign key (manager_id) references employee(id) on delete set null
 );
